@@ -1,31 +1,30 @@
 import { Page, expect } from '@playwright/test';
 
-export class ProductsPage{
+export class ProductsPage {
+  constructor(private page: Page) {}
 
-constructor(private page:Page){}
+  productTitle = (name: string) =>
+    this.page.getByText(name);
 
-async addBackpack(){
+  addToCartBtn = (name: string) =>
+    this.page.locator(`//div[text()="${name}"]/ancestor::div[@class="inventory_item"]//button`);
 
-await this.page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+  cartIcon = () =>
+    this.page.locator('.shopping_cart_link');
 
-}
+  async verifyProductVisible(name: string) {
+    await expect(this.productTitle(name)).toBeVisible();
+  }
 
-async addBikeLight(){
-    await this.page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
-}
+  async sortPriceLowToHigh() {
+    await this.page.locator('.product_sort_container').selectOption('lohi');
+  }
 
-async removeProduct(){
-await this.page.locator('[data-test="remove-sauce-labs-bike-light"]').click();
-}
+  async addProductByName(name: string) {
+    await this.addToCartBtn(name).click();
+  }
 
-async cancelProduct(){
-await this.page.locator('[data-test="cancel"]').click();
-}
-
-async goToCart(){
-
-await this.page.locator('.shopping_cart_link').click();
-
-}
-
+  async goToCart() {
+    await this.cartIcon().click();
+  }
 }
