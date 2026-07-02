@@ -1,23 +1,33 @@
 import { Page, expect } from '@playwright/test';
 
 export class CheckoutPage {
-
   constructor(private page: Page) {}
 
-  async enterDetails(firstName: string, lastName: string, postcode: string) {
-    await this.page.fill('#first-name', firstName);
-    await this.page.fill('#last-name', lastName);
-    await this.page.fill('#postal-code', postcode);
+  firstName = () => this.page.getByPlaceholder('First Name');
+  lastName = () => this.page.getByPlaceholder('Last Name');
+  postalCode = () => this.page.getByPlaceholder('Zip/Postal Code');
 
-    await this.page.locator('#continue').click();
+  continueBtn = () =>
+    this.page.getByRole('button', { name: 'Continue' });
+
+  finishBtn = () =>
+    this.page.getByRole('button', { name: 'Finish' });
+
+  completeHeader = () =>
+    this.page.locator('.complete-header');
+
+  async fillCheckoutForm(data: any) {
+    await this.firstName().fill(data.firstName);
+    await this.lastName().fill(data.lastName);
+    await this.postalCode().fill(data.postalCode);
+    await this.continueBtn().click();
   }
 
-  async finish() {
-    await this.page.locator('#finish').click();
+  async finishOrder() {
+    await this.finishBtn().click();
   }
 
-  async verifyOrder() {
-    await expect(this.page.locator('.complete-header'))
-      .toHaveText('Thank you for your order!');
+  async verifyOrderComplete() {
+    await expect(this.completeHeader()).toHaveText(/thank you/i);
   }
 }
